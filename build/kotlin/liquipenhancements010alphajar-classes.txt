@@ -1,0 +1,1 @@
+/home/sqyyy/projects/liquip-enhancements/build/classes/kotlin/main/io/github/liquip/enhancements/LiquipEnhancementsPlugin.class
