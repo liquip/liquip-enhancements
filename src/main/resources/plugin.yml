@@ -2,5 +2,10 @@ name: liquip-enhancements
 main: io.github.liquip.enhancements.LiquipEnhancementsPlugin
 version: 0.1.0-alpha
 api-version: 1.19
+depend:
+  - liquip
 libraries:
   - org.jetbrains.kotlin:kotlin-stdlib:1.7.22
+commands:
+  test:
+    usage: /test
