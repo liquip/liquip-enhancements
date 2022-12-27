@@ -31,7 +31,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
     compileOnly("io.github.liquip:api:1.3.0-beta")
     compileOnly("io.github.liquip:paper-core:1.3.0-beta")
-    implementation("com.github.sqyyy:cougar-ui:0.1.0-alpha")
+    implementation("com.github.sqyyy:cougar-ui:0.3.0-alpha")
 }
 
 tasks.withType<KotlinCompile> {
