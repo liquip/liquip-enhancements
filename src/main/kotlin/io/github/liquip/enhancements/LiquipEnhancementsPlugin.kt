@@ -29,16 +29,20 @@ class LiquipEnhancementsPlugin : JavaPlugin() {
     private val recipeBookPages = Object2IntOpenHashMap<UUID>()
     private var pageCount = 3
     private var catalogue = listOf<Pair<Item, ItemStack>>()
+    private var openCatalogue = mutableMapOf<UUID, Pair<Item, ItemStack>>()
 
     override fun onEnable() {
         Cougar.initializeSystem(this)
         val api = LiquipProvider.get()
+
         catalogue = StreamSupport.stream(api.itemRegistry.spliterator(), false)
             .map { it to it.newItemStack() }
             .collect(Collectors.toUnmodifiableList())
         val size = catalogue.size
         pageCount = if (size % itemsPerPage == 0) size / itemsPerPage else size / itemsPerPage + 1
+
         var recipeBook: Ui? = null
+        var recipeBookShowcase: Ui? = null
         val craftingTable = paperUi {
             title = Component.text("Crafting Table")
             type = InventoryType.CHEST
@@ -82,11 +86,38 @@ class LiquipEnhancementsPlugin : JavaPlugin() {
                 val row = Slot.getRow(9, slot) - 1
                 val column = Slot.getColumn(9, slot) - 1
                 val i = row * 7 + column
-                player.sendMessage(Component.text("${catalogue.getOrNull(i)?.first?.key()}"))
+                val entry = catalogue.getOrNull(i) ?: return@ClickPanel
+                openCatalogue[player.uniqueId] = entry
+                recipeBookShowcase?.open(player)
             })
             onOpen(2) { player, inventory -> updateRecipeBook(player, inventory) }
             onClose { player, _, reason ->
                 if (reason != InventoryCloseEvent.Reason.OPEN_NEW) {
+                    recipeBookPages.removeInt(player.uniqueId)
+                }
+            }
+        }
+        recipeBookShowcase = paperUi {
+            title = Component.text("Recipe Showcase")
+            type = InventoryType.CHEST
+            rows = 5
+            fill(0, Slot.RowOneSlotOne, Slot.RowFiveSlotNine, namelessItem(Material.BLACK_STAINED_GLASS_PANE))
+            fill(1, Slot.RowTwoSlotTwo, Slot.RowFourSlotFour, namelessItem(Material.AIR))
+            frame(1, Slot.RowTwoSlotSix, Slot.RowFourSlotEight, namelessItem(Material.BARRIER))
+            put(1, Slot.RowThreeSlotNine, namedItem(Material.CRAFTING_TABLE, Component.text("Crafting Table")))
+            put(1, Slot.RowFiveSlotNine, namedItem(Material.SPECTRAL_ARROW, Component.text("Back")))
+            +listOf(1 to SingleSlotClickPanel(Slot.RowThreeSlotNine.chestSlot) { player, _, _ ->
+                recipeBookPages.removeInt(player.uniqueId)
+                openCatalogue.remove(player.uniqueId)
+                craftingTable.open(player)
+            }, 1 to SingleSlotClickPanel(Slot.RowFiveSlotNine.chestSlot) { player, _, _ ->
+                openCatalogue.remove(player.uniqueId)
+                recipeBook.open(player)
+            })
+            onOpen(2) { player, inventory -> loadRecipeShowcase(player, inventory) }
+            onClose { player, _, reason ->
+                if (reason != InventoryCloseEvent.Reason.OPEN_NEW) {
+                    openCatalogue.remove(player.uniqueId)
                     recipeBookPages.removeInt(player.uniqueId)
                 }
             }
@@ -122,5 +153,10 @@ class LiquipEnhancementsPlugin : JavaPlugin() {
             val row = Slot.getRow(7, i) + 1
             inventory.setItem(row * 9 + column, catalogue[i].second)
         }
+    }
+
+    private fun loadRecipeShowcase(player: Player, inventory: Inventory) {
+        val pair = openCatalogue[player.uniqueId] ?: return
+        inventory.setItem(Slot.RowThreeSlotSeven.chestSlot, pair.second)
     }
 }
