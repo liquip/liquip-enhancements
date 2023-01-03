@@ -29,8 +29,8 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
-    compileOnly("io.github.liquip:api:2.0.0-beta")
-    compileOnly("io.github.liquip:paper-core:2.0.0-beta")
+    compileOnly("io.github.liquip:api:2.1.0-beta")
+    //compileOnly("io.github.liquip:paper-core:2.0.0-beta")
 }
 
 tasks.withType<KotlinCompile> {
