@@ -63,7 +63,7 @@ open class Jellyfish(
         jellyfish.isSmall = true
         jellyfish.isInvisible = true
         jellyfish.isInvulnerable = true
-        jellyfish.velocity = loc.direction
+        jellyfish.velocity = loc.direction.add(player.velocity)
         jellyfish.addScoreboardTag("liquip:jellyfish")
         val jellyfishHead = ItemStack(Material.PLAYER_HEAD)
         jellyfishHead.editMeta {
