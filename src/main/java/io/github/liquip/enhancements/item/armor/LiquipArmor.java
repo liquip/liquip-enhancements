@@ -3,26 +3,35 @@ package io.github.liquip.enhancements.item.armor;
 import io.github.liquip.api.Liquip;
 import io.github.liquip.paper.core.item.FixedItem;
 import io.github.liquip.paper.core.item.feature.minecraft.LeatherDyeFeature;
+import io.github.liquip.paper.core.item.feature.minecraft.UnbreakableFeature;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public record LiquipArmor(@NotNull Liquip api) {
-    public static final NamespacedKey HELMET_KEY = new NamespacedKey("liquip", "armor/liquip_helmet");
-    public static final NamespacedKey CHESTPLATE_KEY = new NamespacedKey("liquip", "armor/liquip_chestplate");
-    public static final NamespacedKey LEGGINGS_KEY = new NamespacedKey("liquip", "armor/liquip_leggings");
-    public static final NamespacedKey BOOTS_KEY = new NamespacedKey("liquip", "armor/liquip_boots");
+public record LiquipArmor(@NotNull Liquip api) implements Armor {
+    private static final String TAG = "liquip:armors/liquip";
+    private static final AttributeModifier MODIFIER =
+        new AttributeModifier("liquip:armors/liquip", 20, AttributeModifier.Operation.ADD_NUMBER);
+    private static final NamespacedKey HELMET_KEY = new NamespacedKey("liquip", "armor/liquip_helmet");
+    private static final NamespacedKey CHESTPLATE_KEY = new NamespacedKey("liquip", "armor/liquip_chestplate");
+    private static final NamespacedKey LEGGINGS_KEY = new NamespacedKey("liquip", "armor/liquip_leggings");
+    private static final NamespacedKey BOOTS_KEY = new NamespacedKey("liquip", "armor/liquip_boots");
+    private static final UnbreakableFeature unbreakableFeature = new UnbreakableFeature();
+    private static final LeatherDyeFeature leatherDyeFeature = new LeatherDyeFeature();
 
-    public void register() {
-        final LeatherDyeFeature leatherDyeFeature = new LeatherDyeFeature();
+    public LiquipArmor {
         api.getItemRegistry()
             .register(HELMET_KEY, new FixedItem.Builder().api(api)
                 .key(HELMET_KEY)
                 .material(Material.LEATHER_HELMET)
                 .name(Component.text("Liquip Helmet")
                     .decoration(TextDecoration.ITALIC, false))
+                .feature(unbreakableFeature)
                 .taggedFeature(leatherDyeFeature, 0xFFFFFF)
                 .build());
         api.getItemRegistry()
@@ -31,6 +40,7 @@ public record LiquipArmor(@NotNull Liquip api) {
                 .material(Material.LEATHER_CHESTPLATE)
                 .name(Component.text("Liquip Chestplate")
                     .decoration(TextDecoration.ITALIC, false))
+                .feature(unbreakableFeature)
                 .taggedFeature(leatherDyeFeature, 0xFFFFFF)
                 .build());
         api.getItemRegistry()
@@ -39,6 +49,7 @@ public record LiquipArmor(@NotNull Liquip api) {
                 .material(Material.LEATHER_LEGGINGS)
                 .name(Component.text("Liquip Leggings")
                     .decoration(TextDecoration.ITALIC, false))
+                .feature(unbreakableFeature)
                 .taggedFeature(leatherDyeFeature, 0xFFFFFF)
                 .build());
         api.getItemRegistry()
@@ -47,7 +58,45 @@ public record LiquipArmor(@NotNull Liquip api) {
                 .material(Material.LEATHER_BOOTS)
                 .name(Component.text("Liquip Boots")
                     .decoration(TextDecoration.ITALIC, false))
+                .feature(unbreakableFeature)
                 .taggedFeature(leatherDyeFeature, 0xFFFFFF)
                 .build());
+    }
+
+    @Override
+    public @NotNull String tag() {
+        return TAG;
+    }
+
+    @Override
+    public @NotNull NamespacedKey helmet() {
+        return HELMET_KEY;
+    }
+
+    @Override
+    public @NotNull NamespacedKey chestplate() {
+        return CHESTPLATE_KEY;
+    }
+
+    @Override
+    public @NotNull NamespacedKey leggings() {
+        return LEGGINGS_KEY;
+    }
+
+    @Override
+    public @NotNull NamespacedKey boots() {
+        return BOOTS_KEY;
+    }
+
+    @Override
+    public void attachCallback(@NotNull Player player) {
+        player.getAttribute(Attribute.GENERIC_ARMOR)
+            .addModifier(MODIFIER);
+    }
+
+    @Override
+    public void removeCallback(@NotNull Player player) {
+        player.getAttribute(Attribute.GENERIC_ARMOR)
+            .removeModifier(MODIFIER);
     }
 }
