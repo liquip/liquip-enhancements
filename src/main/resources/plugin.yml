@@ -1,5 +1,5 @@
 name: liquip-enhancements
-main: io.github.liquip.enhancements.LiquipEnhancementsPlugin
+main: io.github.liquip.enhancements.LiquipEnhancements
 version: 0.1.0-alpha
 api-version: 1.19
 depend:

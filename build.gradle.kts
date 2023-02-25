@@ -1,7 +1,5 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    kotlin("jvm") version "1.7.22"
+    java
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -29,10 +27,6 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
-    compileOnly("io.github.liquip:api:2.1.0-beta")
-    //compileOnly("io.github.liquip:paper-core:2.0.0-beta")
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+    compileOnly("io.github.liquip:api:3.0.0-pre")
+    compileOnly("io.github.liquip:paper-core:3.0.0-pre")
 }
