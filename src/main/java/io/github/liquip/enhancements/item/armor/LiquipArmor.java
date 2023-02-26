@@ -2,6 +2,7 @@ package io.github.liquip.enhancements.item.armor;
 
 import io.github.liquip.api.Liquip;
 import io.github.liquip.paper.core.item.FixedItem;
+import io.github.liquip.paper.core.item.feature.minecraft.HideDyeFeature;
 import io.github.liquip.paper.core.item.feature.minecraft.LeatherDyeFeature;
 import io.github.liquip.paper.core.item.feature.minecraft.UnbreakableFeature;
 import net.kyori.adventure.text.Component;
@@ -15,14 +16,14 @@ import org.jetbrains.annotations.NotNull;
 
 public record LiquipArmor(@NotNull Liquip api) implements Armor {
     private static final String TAG = "liquip:armors/liquip";
-    private static final AttributeModifier MODIFIER =
-        new AttributeModifier("liquip:armors/liquip", 20, AttributeModifier.Operation.ADD_NUMBER);
+    private static final AttributeModifier MODIFIER = new AttributeModifier(TAG, 20, AttributeModifier.Operation.ADD_NUMBER);
     private static final NamespacedKey HELMET_KEY = new NamespacedKey("liquip", "armor/liquip_helmet");
     private static final NamespacedKey CHESTPLATE_KEY = new NamespacedKey("liquip", "armor/liquip_chestplate");
     private static final NamespacedKey LEGGINGS_KEY = new NamespacedKey("liquip", "armor/liquip_leggings");
     private static final NamespacedKey BOOTS_KEY = new NamespacedKey("liquip", "armor/liquip_boots");
-    private static final UnbreakableFeature unbreakableFeature = new UnbreakableFeature();
-    private static final LeatherDyeFeature leatherDyeFeature = new LeatherDyeFeature();
+    private static final UnbreakableFeature UNBREAKABLE_FEATURE = new UnbreakableFeature();
+    private static final HideDyeFeature HIDE_DYE_FEATURE = new HideDyeFeature();
+    private static final LeatherDyeFeature LEATHER_DYE_FEATURE = new LeatherDyeFeature();
 
     public LiquipArmor {
         api.getItemRegistry()
@@ -31,8 +32,9 @@ public record LiquipArmor(@NotNull Liquip api) implements Armor {
                 .material(Material.LEATHER_HELMET)
                 .name(Component.text("Liquip Helmet")
                     .decoration(TextDecoration.ITALIC, false))
-                .feature(unbreakableFeature)
-                .taggedFeature(leatherDyeFeature, 0xFFFFFF)
+                .feature(UNBREAKABLE_FEATURE)
+                .feature(HIDE_DYE_FEATURE)
+                .taggedFeature(LEATHER_DYE_FEATURE, 0xFFFFFF)
                 .build());
         api.getItemRegistry()
             .register(CHESTPLATE_KEY, new FixedItem.Builder().api(api)
@@ -40,8 +42,9 @@ public record LiquipArmor(@NotNull Liquip api) implements Armor {
                 .material(Material.LEATHER_CHESTPLATE)
                 .name(Component.text("Liquip Chestplate")
                     .decoration(TextDecoration.ITALIC, false))
-                .feature(unbreakableFeature)
-                .taggedFeature(leatherDyeFeature, 0xFFFFFF)
+                .feature(UNBREAKABLE_FEATURE)
+                .feature(HIDE_DYE_FEATURE)
+                .taggedFeature(LEATHER_DYE_FEATURE, 0xFFFFFF)
                 .build());
         api.getItemRegistry()
             .register(LEGGINGS_KEY, new FixedItem.Builder().api(api)
@@ -49,8 +52,9 @@ public record LiquipArmor(@NotNull Liquip api) implements Armor {
                 .material(Material.LEATHER_LEGGINGS)
                 .name(Component.text("Liquip Leggings")
                     .decoration(TextDecoration.ITALIC, false))
-                .feature(unbreakableFeature)
-                .taggedFeature(leatherDyeFeature, 0xFFFFFF)
+                .feature(UNBREAKABLE_FEATURE)
+                .feature(HIDE_DYE_FEATURE)
+                .taggedFeature(LEATHER_DYE_FEATURE, 0xFFFFFF)
                 .build());
         api.getItemRegistry()
             .register(BOOTS_KEY, new FixedItem.Builder().api(api)
@@ -58,8 +62,9 @@ public record LiquipArmor(@NotNull Liquip api) implements Armor {
                 .material(Material.LEATHER_BOOTS)
                 .name(Component.text("Liquip Boots")
                     .decoration(TextDecoration.ITALIC, false))
-                .feature(unbreakableFeature)
-                .taggedFeature(leatherDyeFeature, 0xFFFFFF)
+                .feature(UNBREAKABLE_FEATURE)
+                .feature(HIDE_DYE_FEATURE)
+                .taggedFeature(LEATHER_DYE_FEATURE, 0xFFFFFF)
                 .build());
     }
 
