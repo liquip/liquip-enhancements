@@ -1,8 +1,0 @@
-name: liquip-enhancements
-main: io.github.liquip.enhancements.LiquipEnhancements
-version: 0.1.0-alpha
-api-version: 1.19
-depend:
-  - Liquip
-libraries:
-  - org.jetbrains.kotlin:kotlin-stdlib:1.7.22
