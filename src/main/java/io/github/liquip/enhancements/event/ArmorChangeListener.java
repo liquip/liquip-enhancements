@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public record EventListeners(@NotNull Liquip api, @NotNull List<Armor> armors) implements Listener {
+public record ArmorChangeListener(@NotNull Liquip api, @NotNull List<Armor> armors) implements Listener {
     @EventHandler
     public void onArmorChange(@NotNull PlayerArmorChangeEvent event) {
         final Player player = event.getPlayer();
