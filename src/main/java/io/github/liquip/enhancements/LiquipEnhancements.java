@@ -6,6 +6,7 @@ import io.github.liquip.enhancements.event.EventListeners;
 import io.github.liquip.enhancements.item.StaffOfPower;
 import io.github.liquip.enhancements.item.TeleportStaff;
 import io.github.liquip.enhancements.item.armor.LiquipArmor;
+import io.github.liquip.enhancements.item.armor.TitaniumArmor;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,6 +19,6 @@ public class LiquipEnhancements extends JavaPlugin {
         new StaffOfPower().register(api);
         new TeleportStaff().register(api);
         Bukkit.getPluginManager()
-            .registerEvents(new EventListeners(api, List.of(new LiquipArmor(api))), this);
+            .registerEvents(new EventListeners(api, List.of(new LiquipArmor(api), new TitaniumArmor(api))), this);
     }
 }
