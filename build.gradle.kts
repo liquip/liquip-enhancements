@@ -30,3 +30,11 @@ dependencies {
     compileOnly("io.github.liquip:api:3.0.1-pre")
     compileOnly("io.github.liquip:paper-core:3.0.1-pre")
 }
+
+tasks.processResources {
+    filesMatching("**/paper-plugin.yml") {
+        filter {
+            return@filter it.replace("\${version}", project.version.toString())
+        }
+    }
+}
