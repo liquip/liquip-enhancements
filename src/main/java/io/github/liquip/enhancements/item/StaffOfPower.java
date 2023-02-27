@@ -1,24 +1,40 @@
 package io.github.liquip.enhancements.item;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import io.github.liquip.api.Liquip;
 import io.github.liquip.paper.core.item.FixedItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LightningStrike;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 public final class StaffOfPower {
     public static final NamespacedKey KEY = new NamespacedKey("liquip", "staff_of_power");
-    private final Liquip api;
-    private final Set<Void> rays;
+    public static final double SPEED = 1;
+    public static final int MAX_LIFE_TICKS = 20 * 20;
+    private final Set<UUID> uuids;
+    private final Set<Ray> rays;
 
-    public StaffOfPower(@NotNull Liquip api) {
-        this.api = api;
+    public StaffOfPower(@NotNull Plugin plugin, @NotNull Liquip api) {
+        uuids = new HashSet<>();
         rays = new HashSet<>();
         api.getItemRegistry()
             .register(KEY, new FixedItem.Builder().api(api)
@@ -27,9 +43,191 @@ public final class StaffOfPower {
                 .name(Component.text("Staff Of Power")
                     .decoration(TextDecoration.ITALIC, false))
                 .build());
+        Bukkit.getScheduler()
+            .runTaskTimer(plugin, () -> rays.removeIf(it -> {
+                boolean remove = it.run();
+                if (remove) {
+                    uuids.remove(it.uuid);
+                }
+                return remove;
+            }), 1, 1);
     }
 
     public void onInteract(@NotNull PlayerInteractEvent event) {
-        // TODO
+        final Player player = event.getPlayer();
+        switch (event.getAction()) {
+            case RIGHT_CLICK_AIR -> {
+                if (uuids.contains(player.getUniqueId())) {
+                    return;
+                }
+                final Location eyeLocation = player.getEyeLocation();
+                eyeLocation.add(eyeLocation.toVector()
+                    .normalize()
+                    .multiply(3));
+                final RayTraceResult result = player.getWorld()
+                    .rayTrace(eyeLocation, eyeLocation.getDirection(), 20, FluidCollisionMode.NEVER, true, 0, null);
+                if (result == null) {
+                    return;
+                }
+                final Entity hitEntity = result.getHitEntity();
+                if (hitEntity != null) {
+                    handleEntity(player, eyeLocation, hitEntity);
+                    return;
+                }
+                final Block hitBlock = result.getHitBlock();
+                if (hitBlock == null) {
+                    return;
+                }
+                handleBlock(player, eyeLocation, hitBlock);
+            }
+            case RIGHT_CLICK_BLOCK -> {
+                if (uuids.contains(player.getUniqueId())) {
+                    return;
+                }
+                final Block block = event.getClickedBlock();
+                if (block == null) {
+                    return;
+                }
+                handleBlock(player, player.getEyeLocation(), block);
+            }
+        }
+    }
+
+    private void handleEntity(@NotNull Player player, @NotNull Location eyeLocation, @NotNull Entity entity) {
+        uuids.add(player.getUniqueId());
+        rays.add(new EntityRay(player.getUniqueId(), entity, eyeLocation.add(entity.getBoundingBox()
+            .getCenter())));
+    }
+
+    private void handleBlock(@NotNull Player player, @NotNull Location eyeLocation, @NotNull Block block) {
+        uuids.add(player.getUniqueId());
+        final Vector movement = block.getLocation()
+            .add(.5, .5, .5)
+            .subtract(eyeLocation)
+            .toVector()
+            .normalize()
+            .multiply(SPEED);
+        rays.add(new BlockRay(player.getUniqueId(), block.getLocation()
+            .add(.5, .5, .5), movement, eyeLocation.add(movement)));
+    }
+
+    private static abstract sealed class Ray permits BlockRay, EntityRay {
+        private final UUID uuid;
+
+        private Ray(UUID uuid) {
+            this.uuid = uuid;
+        }
+
+        /**
+         * @return whether to remove the ray
+         */
+        abstract boolean run();
+    }
+
+    private static final class BlockRay extends Ray {
+        private final Location target;
+        private final Vector movement;
+        private final Location pos;
+        private int lifeTicks;
+
+        private BlockRay(@NotNull UUID uuid, @NotNull Location target, @NotNull Vector movement, @NotNull Location pos) {
+            super(uuid);
+            this.target = target;
+            this.movement = movement;
+            this.pos = pos;
+            lifeTicks = 0;
+        }
+
+        @Override
+        public boolean run() {
+            lifeTicks++;
+            if (target.distanceSquared(pos) < 2.25 || lifeTicks > MAX_LIFE_TICKS) {
+                target.getWorld()
+                    .spawn(target, LightningStrike.class, it -> it.setFlashCount(10));
+                return true;
+            }
+            pos.add(movement);
+            final ParticleBuilder particle = Particle.REDSTONE.builder()
+                .color(255, 0, 255)
+                .count(2)
+                .allPlayers();
+            particle.location(pos);
+            particle.spawn();
+            return false;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
+            var that = (BlockRay) obj;
+            return Objects.equals(this.target, that.target) && Objects.equals(this.movement, that.movement) &&
+                Objects.equals(this.pos, that.pos) && this.lifeTicks == that.lifeTicks;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(target, movement, pos, lifeTicks);
+        }
+    }
+
+    private static final class EntityRay extends Ray {
+        private final Entity target;
+        private final Location pos;
+        private int lifeTicks;
+
+        private EntityRay(@NotNull UUID uuid, @NotNull Entity target, @NotNull Location pos) {
+            super(uuid);
+            this.target = target;
+            this.pos = pos;
+            lifeTicks = 0;
+        }
+
+        @Override
+        public boolean run() {
+            lifeTicks++;
+            final Location location = target.getLocation()
+                .add(target.getBoundingBox()
+                    .getCenter());
+            if (location.distanceSquared(pos) < 2.25 || lifeTicks > MAX_LIFE_TICKS) {
+                target.getWorld()
+                    .spawn(target.getLocation(), LightningStrike.class, it -> it.setFlashCount(10));
+                return true;
+            }
+            final Vector movement = location.subtract(pos)
+                .toVector()
+                .normalize()
+                .multiply(SPEED);
+            pos.add(movement);
+            final ParticleBuilder particle = Particle.REDSTONE.builder()
+                .color(255, 0, 255)
+                .count(2)
+                .allPlayers();
+            particle.location(pos);
+            particle.spawn();
+            return false;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
+            var that = (EntityRay) obj;
+            return Objects.equals(this.target, that.target) && Objects.equals(this.pos, that.pos) &&
+                this.lifeTicks == that.lifeTicks;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(target, pos, lifeTicks);
+        }
     }
 }

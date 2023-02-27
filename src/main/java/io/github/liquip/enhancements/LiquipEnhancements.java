@@ -19,7 +19,7 @@ public class LiquipEnhancements extends JavaPlugin {
     @Override
     public void onEnable() {
         final Liquip api = LiquipProvider.get();
-        final StaffOfPower staffOfPower = new StaffOfPower(api);
+        final StaffOfPower staffOfPower = new StaffOfPower(this, api);
         final TeleportStaff teleportStaff = new TeleportStaff(api);
         final LiquipArmor liquipArmor = new LiquipArmor(api);
         final TitaniumArmor titaniumArmor = new TitaniumArmor(api);
