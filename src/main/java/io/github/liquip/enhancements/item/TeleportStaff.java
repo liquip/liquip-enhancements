@@ -3,6 +3,7 @@ package io.github.liquip.enhancements.item;
 import io.github.liquip.api.Liquip;
 import io.github.liquip.paper.core.item.FixedItem;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -21,7 +22,8 @@ public record TeleportStaff(@NotNull Liquip api) {
             .register(KEY, new FixedItem.Builder().api(api)
                 .key(KEY)
                 .material(Material.STICK)
-                .name(Component.text("Teleport Staff"))
+                .name(Component.text("Teleport Staff")
+                    .decoration(TextDecoration.ITALIC, false))
                 .build());
     }
 
