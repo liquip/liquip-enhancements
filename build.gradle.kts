@@ -6,6 +6,11 @@ plugins {
 group = "io.github.liquip"
 version = "1.0.0-pre"
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 repositories {
     mavenCentral()
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
