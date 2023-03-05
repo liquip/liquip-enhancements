@@ -4,6 +4,7 @@ import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import io.github.liquip.api.Liquip;
 import io.github.liquip.enhancements.LiquipEnhancements;
 import io.github.liquip.enhancements.item.armor.Armor;
+import io.github.liquip.enhancements.item.armor.ArmorPiece;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -15,7 +16,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public record ArmorChangeListener(@NotNull Liquip api, @NotNull List<Armor> armors) implements Listener {
+public record ArmorChangeListener(@NotNull Liquip api, @NotNull List<Armor> armorSets, @NotNull List<ArmorPiece> armorPieces)
+    implements Listener {
     @EventHandler
     public void onArmorChange(@NotNull PlayerArmorChangeEvent event) {
         final Player player = event.getPlayer();
@@ -26,7 +28,7 @@ public record ArmorChangeListener(@NotNull Liquip api, @NotNull List<Armor> armo
                 final ItemStack chestplate = inventory.getChestplate();
                 final ItemStack leggings = inventory.getLeggings();
                 final ItemStack boots = inventory.getBoots();
-                for (final Armor armor : armors) {
+                for (final Armor armor : armorSets) {
                     if (checkItemStack(helmet, armor.helmet())) {
                         if (player.removeScoreboardTag(armor.tag())) {
                             armor.removeCallback(player);
@@ -53,11 +55,32 @@ public record ArmorChangeListener(@NotNull Liquip api, @NotNull List<Armor> armo
                     }
                     if (player.getScoreboardTags()
                         .contains(armor.tag())) {
-                        return;
+                        break;
                     }
                     player.addScoreboardTag(armor.tag());
                     armor.attachCallback(player);
-                    return;
+                    break;
+                }
+                final ItemStack item = switch (event.getSlotType()) {
+                    case HEAD -> inventory.getHelmet();
+                    case CHEST -> inventory.getChestplate();
+                    case LEGS -> inventory.getLeggings();
+                    case FEET -> inventory.getBoots();
+                };
+                for (final ArmorPiece piece : armorPieces) {
+                    if (checkItemStack(item, piece.key())) {
+                        if (player.removeScoreboardTag(piece.tag())) {
+                            piece.removeCallback(player);
+                        }
+                        continue;
+                    }
+                    if (player.getScoreboardTags()
+                        .contains(piece.tag())) {
+                        break;
+                    }
+                    player.addScoreboardTag(piece.tag());
+                    piece.attachCallback(player);
+                    break;
                 }
             });
     }
