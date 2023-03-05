@@ -18,7 +18,7 @@ public record CelestialPlate(@NotNull Liquip api) implements ArmorPiece {
     private static final String TAG = "liquip:armor_sets/celestial";
     private static final AttributeModifier MODIFIER =
         new AttributeModifier(HashUUID.md5(TAG), TAG, 20, AttributeModifier.Operation.ADD_NUMBER);
-    private static final NamespacedKey CHESTPLATE_KEY = new NamespacedKey("liquip", "armor/liquip_chestplate");
+    private static final NamespacedKey CHESTPLATE_KEY = new NamespacedKey("liquip", "armor/celestial_chestplate");
     private static final UnbreakableFeature UNBREAKABLE_FEATURE = new UnbreakableFeature();
     private static final HideDyeFeature HIDE_DYE_FEATURE = new HideDyeFeature();
     private static final LeatherDyeFeature LEATHER_DYE_FEATURE = new LeatherDyeFeature();
