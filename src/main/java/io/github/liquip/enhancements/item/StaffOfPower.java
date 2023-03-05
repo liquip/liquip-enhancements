@@ -3,6 +3,8 @@ package io.github.liquip.enhancements.item;
 import com.destroystokyo.paper.ParticleBuilder;
 import io.github.liquip.api.Liquip;
 import io.github.liquip.paper.core.item.FixedItem;
+import io.github.liquip.paper.core.item.feature.minecraft.AttributeModifierFeature;
+import it.unimi.dsi.fastutil.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -11,6 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LightningStrike;
@@ -22,14 +26,18 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 public final class StaffOfPower {
     public static final NamespacedKey KEY = new NamespacedKey("liquip", "staff_of_power");
-    public static final double SPEED = 1;
-    public static final int MAX_LIFE_TICKS = 20 * 20;
+    private static final double SPEED = 1.5;
+    private static final int MAX_LIFE_TICKS = 20 * 10;
+    private static final ParticleBuilder PARTICLE = Particle.SONIC_BOOM.builder()
+        .count(5)
+        .allPlayers();
     private final Set<UUID> uuids;
     private final Set<Ray> rays;
 
@@ -42,6 +50,8 @@ public final class StaffOfPower {
                 .material(Material.GOLDEN_SHOVEL)
                 .name(Component.text("Staff Of Power")
                     .decoration(TextDecoration.ITALIC, false))
+                .taggedFeature(new AttributeModifierFeature(), List.of(Pair.of(Attribute.GENERIC_ATTACK_DAMAGE,
+                    new AttributeModifier("liquip:staff_of_power", 80, AttributeModifier.Operation.ADD_NUMBER))))
                 .build());
         Bukkit.getScheduler()
             .runTaskTimer(plugin, () -> rays.removeIf(it -> {
@@ -61,11 +71,11 @@ public final class StaffOfPower {
                     return;
                 }
                 final Location eyeLocation = player.getEyeLocation();
-                eyeLocation.add(eyeLocation.toVector()
-                    .normalize()
+                eyeLocation.add(eyeLocation.getDirection()
                     .multiply(3));
                 final RayTraceResult result = player.getWorld()
-                    .rayTrace(eyeLocation, eyeLocation.getDirection(), 20, FluidCollisionMode.NEVER, true, 0, null);
+                    .rayTrace(eyeLocation, player.getEyeLocation()
+                        .getDirection(), 50, FluidCollisionMode.NEVER, true, 0, null);
                 if (result == null) {
                     return;
                 }
@@ -95,8 +105,7 @@ public final class StaffOfPower {
 
     private void handleEntity(@NotNull Player player, @NotNull Location eyeLocation, @NotNull Entity entity) {
         uuids.add(player.getUniqueId());
-        rays.add(new EntityRay(player.getUniqueId(), entity, eyeLocation.add(entity.getBoundingBox()
-            .getCenter())));
+        rays.add(new EntityRay(player.getUniqueId(), entity, eyeLocation));
     }
 
     private void handleBlock(@NotNull Player player, @NotNull Location eyeLocation, @NotNull Block block) {
@@ -108,7 +117,7 @@ public final class StaffOfPower {
             .normalize()
             .multiply(SPEED);
         rays.add(new BlockRay(player.getUniqueId(), block.getLocation()
-            .add(.5, .5, .5), movement, eyeLocation.add(movement)));
+            .add(.5, .5, .5), movement, eyeLocation/*.add(movement)*/));
     }
 
     private static abstract sealed class Ray permits BlockRay, EntityRay {
@@ -141,18 +150,20 @@ public final class StaffOfPower {
         @Override
         public boolean run() {
             lifeTicks++;
-            if (target.distanceSquared(pos) < 2.25 || lifeTicks > MAX_LIFE_TICKS) {
+            if (lifeTicks > MAX_LIFE_TICKS) {
+                return true;
+            }
+            if (target.distanceSquared(pos) < 2.25) {
                 target.getWorld()
-                    .spawn(target, LightningStrike.class, it -> it.setFlashCount(10));
+                    .spawn(target, LightningStrike.class, it -> {
+                        it.setLifeTicks(5);
+                        it.setFlashCount(10);
+                    });
                 return true;
             }
             pos.add(movement);
-            final ParticleBuilder particle = Particle.REDSTONE.builder()
-                .color(255, 0, 255)
-                .count(2)
-                .allPlayers();
-            particle.location(pos);
-            particle.spawn();
+            PARTICLE.location(pos);
+            PARTICLE.spawn();
             return false;
         }
 
@@ -190,12 +201,16 @@ public final class StaffOfPower {
         @Override
         public boolean run() {
             lifeTicks++;
-            final Location location = target.getLocation()
-                .add(target.getBoundingBox()
-                    .getCenter());
-            if (location.distanceSquared(pos) < 2.25 || lifeTicks > MAX_LIFE_TICKS) {
+            final Location location = target.getLocation();
+            if (lifeTicks > MAX_LIFE_TICKS) {
+                return true;
+            }
+            if (location.distanceSquared(pos) < 2.25) {
                 target.getWorld()
-                    .spawn(target.getLocation(), LightningStrike.class, it -> it.setFlashCount(10));
+                    .spawn(target.getLocation(), LightningStrike.class, it -> {
+                        it.setLifeTicks(5);
+                        it.setFlashCount(10);
+                    });
                 return true;
             }
             final Vector movement = location.subtract(pos)
@@ -203,12 +218,8 @@ public final class StaffOfPower {
                 .normalize()
                 .multiply(SPEED);
             pos.add(movement);
-            final ParticleBuilder particle = Particle.REDSTONE.builder()
-                .color(255, 0, 255)
-                .count(2)
-                .allPlayers();
-            particle.location(pos);
-            particle.spawn();
+            PARTICLE.location(pos);
+            PARTICLE.spawn();
             return false;
         }
 
