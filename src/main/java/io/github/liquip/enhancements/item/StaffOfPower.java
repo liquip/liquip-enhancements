@@ -2,6 +2,7 @@ package io.github.liquip.enhancements.item;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import io.github.liquip.api.Liquip;
+import io.github.liquip.enhancements.util.HashUUID;
 import io.github.liquip.paper.core.item.FixedItem;
 import io.github.liquip.paper.core.item.feature.minecraft.AttributeModifierFeature;
 import it.unimi.dsi.fastutil.Pair;
@@ -33,6 +34,7 @@ import java.util.UUID;
 
 public final class StaffOfPower {
     public static final NamespacedKey KEY = new NamespacedKey("liquip", "staff_of_power");
+    private static final String TAG = "liquip:staff_of_power";
     private static final double SPEED = 1.5;
     private static final int MAX_LIFE_TICKS = 20 * 10;
     private static final ParticleBuilder PARTICLE = Particle.SONIC_BOOM.builder()
@@ -51,7 +53,7 @@ public final class StaffOfPower {
                 .name(Component.text("Staff Of Power")
                     .decoration(TextDecoration.ITALIC, false))
                 .taggedFeature(new AttributeModifierFeature(), List.of(Pair.of(Attribute.GENERIC_ATTACK_DAMAGE,
-                    new AttributeModifier("liquip:staff_of_power", 80, AttributeModifier.Operation.ADD_NUMBER))))
+                    new AttributeModifier(HashUUID.md5(TAG), TAG, 80, AttributeModifier.Operation.ADD_NUMBER))))
                 .build());
         Bukkit.getScheduler()
             .runTaskTimer(plugin, () -> rays.removeIf(it -> {
