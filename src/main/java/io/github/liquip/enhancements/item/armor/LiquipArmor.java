@@ -1,6 +1,7 @@
 package io.github.liquip.enhancements.item.armor;
 
 import io.github.liquip.api.Liquip;
+import io.github.liquip.enhancements.util.HashUUID;
 import io.github.liquip.paper.core.item.FixedItem;
 import io.github.liquip.paper.core.item.feature.minecraft.HideDyeFeature;
 import io.github.liquip.paper.core.item.feature.minecraft.LeatherDyeFeature;
@@ -15,8 +16,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public record LiquipArmor(@NotNull Liquip api) implements Armor {
-    private static final String TAG = "liquip:armors/liquip";
-    private static final AttributeModifier MODIFIER = new AttributeModifier(TAG, 20, AttributeModifier.Operation.ADD_NUMBER);
+    private static final String TAG = "liquip:armor_sets/liquip";
+    private static final AttributeModifier MODIFIER =
+        new AttributeModifier(HashUUID.md5(TAG), TAG, 20, AttributeModifier.Operation.ADD_NUMBER);
     private static final NamespacedKey HELMET_KEY = new NamespacedKey("liquip", "armor/liquip_helmet");
     private static final NamespacedKey CHESTPLATE_KEY = new NamespacedKey("liquip", "armor/liquip_chestplate");
     private static final NamespacedKey LEGGINGS_KEY = new NamespacedKey("liquip", "armor/liquip_leggings");
