@@ -1,7 +1,7 @@
 package io.github.liquip.enhancements.item;
 
 import com.destroystokyo.paper.ParticleBuilder;
-import io.github.liquip.api.Liquip;
+import io.github.liquip.enhancements.LiquipEnhancements;
 import io.github.liquip.enhancements.util.HashUUID;
 import io.github.liquip.paper.core.item.FixedItem;
 import io.github.liquip.paper.core.item.feature.minecraft.AttributeModifierFeature;
@@ -21,7 +21,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -43,11 +42,12 @@ public final class StaffOfPower {
     private final Set<UUID> uuids;
     private final Set<Ray> rays;
 
-    public StaffOfPower(@NotNull Plugin plugin, @NotNull Liquip api) {
+    public StaffOfPower(@NotNull LiquipEnhancements plugin) {
         uuids = new HashSet<>();
         rays = new HashSet<>();
-        api.getItemRegistry()
-            .register(KEY, new FixedItem.Builder().api(api)
+        plugin.getApi()
+            .getItemRegistry()
+            .register(KEY, new FixedItem.Builder().api(plugin.getApi())
                 .key(KEY)
                 .material(Material.GOLDEN_SHOVEL)
                 .name(Component.text("Staff Of Power")

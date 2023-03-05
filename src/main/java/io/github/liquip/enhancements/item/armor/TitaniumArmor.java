@@ -1,6 +1,6 @@
 package io.github.liquip.enhancements.item.armor;
 
-import io.github.liquip.api.Liquip;
+import io.github.liquip.enhancements.LiquipEnhancements;
 import io.github.liquip.enhancements.util.HashUUID;
 import io.github.liquip.paper.core.item.FixedItem;
 import io.github.liquip.paper.core.item.feature.minecraft.HideDyeFeature;
@@ -15,7 +15,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public record TitaniumArmor(@NotNull Liquip api) implements Armor {
+public record TitaniumArmor(@NotNull LiquipEnhancements plugin) implements Armor {
     private static final String TAG = "liquip:armor_sets/titanium";
     private static final AttributeModifier MODIFIER =
         new AttributeModifier(HashUUID.md5(TAG), TAG, 20, AttributeModifier.Operation.ADD_NUMBER);
@@ -28,8 +28,14 @@ public record TitaniumArmor(@NotNull Liquip api) implements Armor {
     private static final LeatherDyeFeature LEATHER_DYE_FEATURE = new LeatherDyeFeature();
 
     public TitaniumArmor {
-        api.getItemRegistry()
-            .register(HELMET_KEY, new FixedItem.Builder().api(api)
+        plugin.getTags()
+            .put(TAG, player -> {
+                player.removeScoreboardTag(TAG);
+                removeCallback(player);
+            });
+        plugin.getApi()
+            .getItemRegistry()
+            .register(HELMET_KEY, new FixedItem.Builder().api(plugin.getApi())
                 .key(HELMET_KEY)
                 .material(Material.LEATHER_HELMET)
                 .name(Component.text("Titanium Helmet")
@@ -38,8 +44,9 @@ public record TitaniumArmor(@NotNull Liquip api) implements Armor {
                 .feature(HIDE_DYE_FEATURE)
                 .taggedFeature(LEATHER_DYE_FEATURE, 0x878681)
                 .build());
-        api.getItemRegistry()
-            .register(CHESTPLATE_KEY, new FixedItem.Builder().api(api)
+        plugin.getApi()
+            .getItemRegistry()
+            .register(CHESTPLATE_KEY, new FixedItem.Builder().api(plugin.getApi())
                 .key(CHESTPLATE_KEY)
                 .material(Material.LEATHER_CHESTPLATE)
                 .name(Component.text("Titanium Chestplate")
@@ -48,8 +55,9 @@ public record TitaniumArmor(@NotNull Liquip api) implements Armor {
                 .feature(HIDE_DYE_FEATURE)
                 .taggedFeature(LEATHER_DYE_FEATURE, 0x878681)
                 .build());
-        api.getItemRegistry()
-            .register(LEGGINGS_KEY, new FixedItem.Builder().api(api)
+        plugin.getApi()
+            .getItemRegistry()
+            .register(LEGGINGS_KEY, new FixedItem.Builder().api(plugin.getApi())
                 .key(LEGGINGS_KEY)
                 .material(Material.LEATHER_LEGGINGS)
                 .name(Component.text("Titanium Leggings")
@@ -58,8 +66,9 @@ public record TitaniumArmor(@NotNull Liquip api) implements Armor {
                 .feature(HIDE_DYE_FEATURE)
                 .taggedFeature(LEATHER_DYE_FEATURE, 0x878681)
                 .build());
-        api.getItemRegistry()
-            .register(BOOTS_KEY, new FixedItem.Builder().api(api)
+        plugin.getApi()
+            .getItemRegistry()
+            .register(BOOTS_KEY, new FixedItem.Builder().api(plugin.getApi())
                 .key(BOOTS_KEY)
                 .material(Material.LEATHER_BOOTS)
                 .name(Component.text("Titanium Boots")

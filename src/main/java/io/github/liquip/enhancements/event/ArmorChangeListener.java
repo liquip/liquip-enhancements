@@ -68,6 +68,9 @@ public record ArmorChangeListener(@NotNull Liquip api, @NotNull List<Armor> armo
                     case FEET -> inventory.getBoots();
                 };
                 for (final ArmorPiece piece : armorPieces) {
+                    if (event.getSlotType() != piece.slot()) {
+                        continue;
+                    }
                     if (checkItemStack(item, piece.key())) {
                         if (player.removeScoreboardTag(piece.tag())) {
                             piece.removeCallback(player);
