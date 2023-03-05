@@ -1,7 +1,7 @@
 package io.github.liquip.enhancements.item.armor;
 
-import io.github.liquip.api.Liquip;
-import io.github.liquip.enhancements.util.HashUUID;
+import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
+import io.github.liquip.enhancements.LiquipEnhancements;
 import io.github.liquip.paper.core.item.FixedItem;
 import io.github.liquip.paper.core.item.feature.minecraft.HideDyeFeature;
 import io.github.liquip.paper.core.item.feature.minecraft.LeatherDyeFeature;
