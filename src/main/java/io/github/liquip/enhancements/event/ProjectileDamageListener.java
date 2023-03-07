@@ -1,6 +1,6 @@
 package io.github.liquip.enhancements.event;
 
-import io.github.liquip.api.Liquip;
+import io.github.liquip.enhancements.LiquipEnhancements;
 import io.github.liquip.enhancements.item.armor.CelestialPlate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,7 +9,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public record ProjectileDamageListener(@NotNull Liquip api) implements Listener {
+public record ProjectileDamageListener(@NotNull LiquipEnhancements plugin) implements Listener {
     @EventHandler
     public void onDamage(ProjectileHitEvent event) {
         if (!(event.getHitEntity() instanceof Player player)) {
@@ -17,7 +17,9 @@ public record ProjectileDamageListener(@NotNull Liquip api) implements Listener 
         }
         final ItemStack chestplate = player.getInventory()
             .getChestplate();
-        if (chestplate == null || !api.isCustomItemStack(chestplate) || !api.getKeyFromItemStack(chestplate)
+        if (chestplate == null || !plugin.getApi()
+            .isCustomItemStack(chestplate) || !plugin.getApi()
+            .getKeyFromItemStack(chestplate)
             .equals(CelestialPlate.CHESTPLATE_KEY)) {
             return;
         }

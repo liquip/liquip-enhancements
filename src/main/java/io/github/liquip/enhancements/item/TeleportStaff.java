@@ -1,6 +1,6 @@
 package io.github.liquip.enhancements.item;
 
-import io.github.liquip.api.Liquip;
+import io.github.liquip.enhancements.LiquipEnhancements;
 import io.github.liquip.paper.core.item.FixedItem;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -13,13 +13,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-public record TeleportStaff(@NotNull Liquip api) {
+public record TeleportStaff(@NotNull LiquipEnhancements plugin) {
     public static final NamespacedKey KEY = new NamespacedKey("liquip", "teleport_staff");
     private static final Vector Y_ONE = new Vector(0, 1, 0);
 
     public TeleportStaff {
-        api.getItemRegistry()
-            .register(KEY, new FixedItem.Builder().api(api)
+        plugin.getApi()
+            .getItemRegistry()
+            .register(KEY, new FixedItem.Builder().api(plugin.getApi())
                 .key(KEY)
                 .material(Material.STICK)
                 .name(Component.text("Teleport Staff")
