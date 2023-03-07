@@ -3,9 +3,11 @@ package io.github.liquip.enhancements;
 import io.github.liquip.api.Liquip;
 import io.github.liquip.api.LiquipProvider;
 import io.github.liquip.enhancements.event.ArmorChangeListener;
+import io.github.liquip.enhancements.event.FishListener;
 import io.github.liquip.enhancements.event.InteractListener;
 import io.github.liquip.enhancements.event.ProjectileDamageListener;
 import io.github.liquip.enhancements.event.QuitListener;
+import io.github.liquip.enhancements.item.GrapplingHook;
 import io.github.liquip.enhancements.item.StaffOfPower;
 import io.github.liquip.enhancements.item.TeleportStaff;
 import io.github.liquip.enhancements.item.armor.AbyssalDepthSuit;
@@ -28,9 +30,15 @@ public class LiquipEnhancements extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        api = LiquipProvider.get();
+        try {
+            api = LiquipProvider.get();
+        } catch (IllegalStateException e) {
+            getSLF4JLogger().error("No Liquip API is available", e);
+            return;
+        }
+        final GrapplingHook grapplingHook = new GrapplingHook(this);
         final StaffOfPower staffOfPower = new StaffOfPower(this);
-        final TeleportStaff teleportStaff = new TeleportStaff(api);
+        final TeleportStaff teleportStaff = new TeleportStaff(this);
         final AbyssalDepthSuit abyssalDepthSuit = new AbyssalDepthSuit(this);
         final CelestialPlate celestialPlate = new CelestialPlate(this);
         final LiquipArmor liquipArmor = new LiquipArmor(this);
@@ -40,8 +48,9 @@ public class LiquipEnhancements extends JavaPlugin {
             new ArmorChangeListener(api, List.of(abyssalDepthSuit, liquipArmor, titaniumArmor), List.of(celestialPlate)), this);
         pluginManager.registerEvents(new InteractListener(api,
             Map.of(StaffOfPower.KEY, staffOfPower::onInteract, TeleportStaff.KEY, teleportStaff::onInteract)), this);
-        pluginManager.registerEvents(new ProjectileDamageListener(api), this);
+        pluginManager.registerEvents(new ProjectileDamageListener(this), this);
         pluginManager.registerEvents(new QuitListener(this), this);
+        pluginManager.registerEvents(new FishListener(this), this);
     }
 
     public Map<String, Consumer<Player>> getTags() {
