@@ -13,26 +13,16 @@ java {
 repositories {
     mavenCentral()
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
-    maven {
-        url = uri("https://maven.pkg.github.com/liquip/liquip-plugin")
-        credentials {
-            username = System.getenv("GRADLE_GITHUB_USERNAME")
-            password = System.getenv("GRADLE_GITHUB_TOKEN")
-        }
-    }
-    maven {
-        url = uri("https://maven.pkg.github.com/sqyyy-jar/cougar-ui")
-        credentials {
-            username = System.getenv("GRADLE_GITHUB_USERNAME")
-            password = System.getenv("GRADLE_GITHUB_TOKEN")
-        }
-    }
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
-    compileOnly("io.github.liquip:api:3.0.1-pre")
-    compileOnly("io.github.liquip:paper-core:3.0.1-pre")
+    compileOnly("io.papermc.paper:paper-api:1.20.2-R0.1-SNAPSHOT")
+    compileOnly("io.github.liquip:api:3.1.0") {
+        version { branch = "nightly" }
+    }
+    compileOnly("io.github.liquip:paper-core:3.1.0") {
+        version { branch = "nightly" }
+    }
 }
 
 tasks.processResources {

@@ -1,11 +1,10 @@
 name: LiquipEnhancements
 main: io.github.liquip.enhancements.LiquipEnhancements
 version: ${version}
-api-version: 1.19
+api-version: '1.20'
 dependencies:
-  - name: Liquip
-    required: true
-    bootstrap: false
-load-before:
-  - name: Liquip
-    bootstrap: false
+  server:
+    Liquip:
+      load: BEFORE
+      required: true
+      join-classpath: true
